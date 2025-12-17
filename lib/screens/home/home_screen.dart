@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../jobs/jobs_list_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,7 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     const HomeContent(),
     const Center(child: Text("Jobs Page", style: TextStyle(fontSize: 22))),
-    const Center(child: Text("Profile Page", style: TextStyle(fontSize: 22))),
+    const ProfileScreen(),
   ];
 
   @override
