@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
-// TODO: replace this with LoginScreen later
-// import '../auth/login_screen.dart';
+import '../auth/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,15 +14,12 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // Splash delay + safe navigation
     Timer(const Duration(seconds: 3), () {
       if (!mounted) return;
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const Placeholder(), // LoginScreen later
-        ),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     });
   }
