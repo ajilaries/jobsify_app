@@ -15,8 +15,9 @@ class LoginScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 40),
 
+              // Title
               const Text(
-                "Welcome Back",
+                "Jobsify",
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -31,17 +32,11 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Email
-              _inputField(label: "Email", hint: "example@gmail.com"),
+              _inputField(label: "Email"),
 
               const SizedBox(height: 20),
 
-              // Password
-              _inputField(
-                label: "Password",
-                hint: "••••••••",
-                isPassword: true,
-              ),
+              _inputField(label: "Password", isPassword: true),
 
               const SizedBox(height: 16),
 
@@ -59,7 +54,6 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Login Button
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -79,7 +73,6 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // Google Button
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -125,12 +118,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  // Reusable Input Field
-  Widget _inputField({
-    required String label,
-    required String hint,
-    bool isPassword = false,
-  }) {
+  Widget _inputField({required String label, bool isPassword = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -139,7 +127,6 @@ class LoginScreen extends StatelessWidget {
         TextField(
           obscureText: isPassword,
           decoration: InputDecoration(
-            hintText: hint,
             filled: true,
             fillColor: Colors.grey.shade100,
             suffixIcon: isPassword ? const Icon(Icons.visibility_off) : null,
