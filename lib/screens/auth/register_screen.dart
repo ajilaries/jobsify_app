@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +33,6 @@ class RegisterScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 40),
 
-              // Title
               const Text(
                 "Jobsify",
                 style: TextStyle(
@@ -32,18 +49,23 @@ class RegisterScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              _inputField(label: "Full name"),
+              _inputField(label: "Full name", controller: nameController),
 
               const SizedBox(height: 20),
 
-              _inputField(label: "Email"),
+              _inputField(label: "Email", controller: emailController),
 
               const SizedBox(height: 20),
 
-              _inputField(label: "Password", isPassword: true),
+              _inputField(
+                label: "Password",
+                controller: passwordController,
+                isPassword: true,
+              ),
 
               const SizedBox(height: 30),
 
+              // ✅ SIGN UP BUTTON (BACKEND CONNECTED)
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -54,15 +76,14 @@ class RegisterScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/home');
-                  },
+                  onPressed: _registerUser,
                   child: const Text("SIGN UP", style: TextStyle(fontSize: 16)),
                 ),
               ),
 
               const SizedBox(height: 16),
 
+              // 🚧 GOOGLE SIGN UP (DUMMY FOR NOW)
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -73,7 +94,13 @@ class RegisterScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Google sign-in coming soon"),
+                      ),
+                    );
+                  },
                   child: const Text(
                     "SIGN UP WITH GOOGLE",
                     style: TextStyle(color: Colors.black),
@@ -108,13 +135,49 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _inputField({required String label, bool isPassword = false}) {
+  // 🔹 REGISTER FUNCTION (CLEAN & SAFE)
+  Future<void> _registerUser() async {
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+      return;
+    }
+
+    final success = await AuthService.registerUser(
+      name: nameController.text.trim(),
+      email: emailController.text.trim(),
+      password: passwordController.text,
+      role: "seeker",
+    );
+
+    if (success) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Registration Successful")));
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Registration Failed")));
+    }
+  }
+
+  // 🔹 INPUT FIELD WIDGET
+  Widget _inputField({
+    required String label,
+    required TextEditingController controller,
+    bool isPassword = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
           obscureText: isPassword,
           decoration: InputDecoration(
             filled: true,
