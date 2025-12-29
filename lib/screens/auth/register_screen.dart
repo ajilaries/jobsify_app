@@ -153,11 +153,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       role: "seeker",
     );
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Registration Successful")));
-      Navigator.pop(context);
+
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(
         context,
