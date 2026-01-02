@@ -22,3 +22,4 @@ class FindJobsScreen extends StatelessWidget {
     );
   }
 }
+//this is the find job card file
