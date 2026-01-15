@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../jobs/jobs_list_screen.dart';
 import '../profile/profile_screen.dart';
+import '../jobs/find_job_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -114,15 +115,31 @@ class HomeContent extends StatelessWidget {
 
           // 🚀 PRIMARY ACTIONS (MOST IMPORTANT)
           Row(
-            children: const [
+            children: [
               Expanded(
-                child: PrimaryActionCard(
-                  title: "Find Jobs",
-                  subtitle: "Work near you",
-                  icon: Icons.work,
-                  color: Color(0xFF1B0C6D),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const FindJobsScreen(),
+                        ),
+                      );
+                    },
+                    child: PrimaryActionCard(
+                      title: "Find Jobs",
+                      subtitle: "Work near you",
+                      icon: Icons.work,
+                      color: Color(0xFF1B0C6D),
+                    ),
+                  ),
                 ),
               ),
+
               SizedBox(width: 16),
               Expanded(
                 child: PrimaryActionCard(
@@ -166,7 +183,7 @@ class HomeContent extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 1.1,
+              childAspectRatio: 1.3,
             ),
             itemBuilder: (context, index) {
               final category = categories[index];
@@ -183,7 +200,7 @@ class HomeContent extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
@@ -199,19 +216,19 @@ class HomeContent extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircleAvatar(
-                        radius: 28,
+                        radius: 22,
                         backgroundColor: category["color"],
                         child: Icon(
                           category["icon"],
                           color: Colors.white,
-                          size: 28,
+                          size: 22,
                         ),
                       ),
                       const SizedBox(height: 14),
                       Text(
                         category["name"],
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -230,9 +247,18 @@ class HomeContent extends StatelessWidget {
           const SizedBox(height: 32),
 
           // ⭐ Popular Jobs
-          const Text(
-            "Popular Jobs",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                "Popular Jobs",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                "View all",
+                style: TextStyle(fontSize: 13, color: Color(0xFF1B0C6D)),
+              ),
+            ],
           ),
 
           const SizedBox(height: 12),
@@ -292,19 +318,21 @@ class QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1B0C6D).withOpacity(0.08),
-            shape: BoxShape.circle,
+    return Container(
+      width: 72,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: commonCardDecoration(),
+      child: Column(
+        children: [
+          Icon(icon, color: const Color(0xFF1B0C6D), size: 20),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11),
+            textAlign: TextAlign.center,
           ),
-          child: Icon(icon, color: const Color(0xFF1B0C6D)),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 12)),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -325,29 +353,34 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6),
-        ],
-      ),
+      padding: const EdgeInsets.all(12),
+      decoration: commonCardDecoration(),
       child: Row(
         children: [
           CircleAvatar(
+            radius: 20,
             backgroundColor: const Color(0xFF1B0C6D).withOpacity(0.1),
-            child: Icon(icon, color: const Color(0xFF1B0C6D)),
+            child: Icon(icon, color: const Color(0xFF1B0C6D), size: 20),
           ),
-
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              Text(subtitle, style: const TextStyle(color: Colors.grey)),
-            ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -365,20 +398,27 @@ class WorkerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      padding: const EdgeInsets.all(12),
+      decoration: commonCardDecoration(),
       child: Row(
         children: [
-          const CircleAvatar(child: Icon(Icons.person)),
-          const SizedBox(width: 16),
+          const CircleAvatar(radius: 20, child: Icon(Icons.person, size: 20)),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(skill, style: const TextStyle(color: Colors.grey)),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                skill,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
             ],
           ),
         ],
@@ -502,4 +542,18 @@ class AppDrawer extends StatelessWidget {
       ),
     );
   }
+}
+
+BoxDecoration commonCardDecoration() {
+  return BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(14),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.05),
+        blurRadius: 8,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  );
 }
