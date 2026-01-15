@@ -12,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
+  final List<Widget> _pages = [
     HomeContent(),
     Center(child: Text("Jobs Page", style: TextStyle(fontSize: 22))),
     ProfileScreen(),
@@ -67,7 +67,18 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
+  final List<Map<String, dynamic>> categories = [
+    {"name": "Plumber", "icon": Icons.plumbing, "color": Colors.blue},
+    {"name": "Painter", "icon": Icons.format_paint, "color": Colors.orange},
+    {"name": "Driver", "icon": Icons.local_shipping, "color": Colors.green},
+    {"name": "Electrician", "icon": Icons.flash_on, "color": Colors.amber},
+    {"name": "Carpenter", "icon": Icons.handyman, "color": Colors.purple},
+    {"name": "Mason", "icon": Icons.construction, "color": Colors.red},
+    {"name": "Cleaner", "icon": Icons.cleaning_services, "color": Colors.pink},
+    {"name": "Other", "icon": Icons.more_horiz, "color": Colors.indigo},
+  ];
+
+  HomeContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -147,21 +158,73 @@ class HomeContent extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          GridView.count(
+          GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            children: const [
-              CategoryTile(icon: Icons.flash_on, label: "Electrician"),
-              CategoryTile(icon: Icons.plumbing, label: "Plumber"),
-              CategoryTile(icon: Icons.construction, label: "Carpenter"),
-              CategoryTile(icon: Icons.local_shipping, label: "Driver"),
-              CategoryTile(icon: Icons.build, label: "Technician"),
-              CategoryTile(icon: Icons.home_repair_service, label: "Mechanic"),
-              CategoryTile(icon: Icons.more_horiz, label: "Others"),
-            ],
+            itemCount: categories.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.1,
+            ),
+            itemBuilder: (context, index) {
+              final category = categories[index];
+
+              return InkWell(
+                borderRadius: BorderRadius.circular(18),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          JobsListScreen(category: category["name"]),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 10,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: category["color"],
+                        child: Icon(
+                          category["icon"],
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        category["name"],
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        "Find Now",
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
 
           const SizedBox(height: 32),
@@ -216,68 +279,6 @@ class HomeContent extends StatelessWidget {
 
           const SizedBox(height: 40),
         ],
-      ),
-    );
-  }
-}
-
-class CategoryTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const CategoryTile({super.key, required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => JobsListScreen(category: label)),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              backgroundColor: label == "Others"
-                  ? Colors.grey.shade200
-                  : const Color(0xFF1B0C6D).withOpacity(0.1),
-              child: Icon(
-                icon,
-                color: label == "Others"
-                    ? Colors.black54
-                    : const Color(0xFF1B0C6D),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              "Find now",
-              style: TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-          ],
-        ),
       ),
     );
   }
