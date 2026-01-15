@@ -125,9 +125,7 @@ class HomeContent extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const FindJobsScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => FindJobsScreen()),
                       );
                     },
                     child: PrimaryActionCard(

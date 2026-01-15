@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../jobs/add_job_screen.dart';
 
 class FindJobsScreen extends StatelessWidget {
   const FindJobsScreen({super.key});
@@ -23,7 +24,12 @@ class FindJobsScreen extends StatelessWidget {
             ),
             child: IconButton(
               icon: const Icon(Icons.add, color: Colors.black),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddJobScreen()),
+                );
+              },
             ),
           ),
         ],
@@ -39,6 +45,9 @@ class FindJobsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _jobsHeader(),
             const SizedBox(height: 16),
+            _jobCard(),
+            _jobCard(),
+            _jobCard(),
             _jobCard(),
             _jobCard(),
           ],
