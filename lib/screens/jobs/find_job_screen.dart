@@ -4,12 +4,17 @@ import '../jobs/add_job_screen.dart';
 class FindJobsScreen extends StatelessWidget {
   const FindJobsScreen({super.key});
 
+  static const Color primaryColor = Colors.red;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
+
+      // 🔴 APP BAR
       appBar: AppBar(
-        backgroundColor: Colors.red,
+        backgroundColor: primaryColor,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -34,6 +39,8 @@ class FindJobsScreen extends StatelessWidget {
           ),
         ],
       ),
+
+      // 🧱 BODY
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -45,8 +52,8 @@ class FindJobsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _jobsHeader(),
             const SizedBox(height: 16),
-            _jobCard(),
-            _jobCard(),
+
+            // 🔹 JOB CARDS (MOCK)
             _jobCard(),
             _jobCard(),
             _jobCard(),
@@ -56,7 +63,7 @@ class FindJobsScreen extends StatelessWidget {
     );
   }
 
-  // 🔍 Search bar
+  // 🔍 SEARCH BAR
   Widget _searchBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -74,7 +81,7 @@ class FindJobsScreen extends StatelessWidget {
     );
   }
 
-  // 🧩 Category chips
+  // 🧩 CATEGORY CHIPS
   Widget _categoryChips() {
     final categories = ["All", "Plumber", "Painter", "Driver"];
 
@@ -90,14 +97,14 @@ class FindJobsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isSelected ? Colors.red : Colors.white,
+              color: isSelected ? primaryColor : Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.red),
+              border: Border.all(color: primaryColor),
             ),
             child: Text(
               categories[index],
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.red,
+                color: isSelected ? Colors.white : primaryColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -107,7 +114,7 @@ class FindJobsScreen extends StatelessWidget {
     );
   }
 
-  // 📌 Jobs header
+  // 📌 HEADER
   Widget _jobsHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -124,7 +131,7 @@ class FindJobsScreen extends StatelessWidget {
     );
   }
 
-  // 🧱 Job card (dummy)
+  // 🧱 JOB CARD
   Widget _jobCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -138,24 +145,30 @@ class FindJobsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              _tag("Plumber", Colors.red),
+              _tag("Plumber", primaryColor),
               const SizedBox(width: 6),
               _tag("URGENT", Colors.orange),
               const SizedBox(width: 6),
               _tag("Verified", Colors.green),
             ],
           ),
+
           const SizedBox(height: 10),
+
           const Text(
             "Need Plumber for Kitchen Repair",
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
+
           const SizedBox(height: 6),
+
           const Text(
             "Kitchen sink and pipe repair needed urgently. Must have 2+ years experience.",
             style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
+
           const SizedBox(height: 10),
+
           Row(
             children: const [
               Icon(Icons.location_on, size: 16, color: Colors.red),
@@ -167,7 +180,9 @@ class FindJobsScreen extends StatelessWidget {
               Text("2 hours ago"),
             ],
           ),
+
           const SizedBox(height: 12),
+
           Container(
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
             decoration: BoxDecoration(
@@ -182,12 +197,14 @@ class FindJobsScreen extends StatelessWidget {
               ),
             ),
           ),
+
           const SizedBox(height: 12),
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: primaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
