@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import '../jobs/add_job_screen.dart';
+import '../jobs/post_job_screen.dart';
 
-class FindJobsScreen extends StatelessWidget {
-  const FindJobsScreen({super.key});
+class FindWorkersScreen extends StatelessWidget {
+  FindWorkersScreen({super.key});
 
-  static const Color primaryColor = Colors.red;
+  static const Color primaryColor = Color(0xFF1B0C6D);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
 
-      // 🔴 APP BAR
       appBar: AppBar(
         backgroundColor: primaryColor,
-        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -32,7 +30,7 @@ class FindJobsScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const AddJobScreen()),
+                  MaterialPageRoute(builder: (_) => const PostJobScreen()),
                 );
               },
             ),
@@ -40,7 +38,6 @@ class FindJobsScreen extends StatelessWidget {
         ],
       ),
 
-      // 🧱 BODY
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -50,20 +47,32 @@ class FindJobsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _categoryChips(),
             const SizedBox(height: 16),
-            _jobsHeader(),
+            _header(),
             const SizedBox(height: 16),
 
-            // 🔹 JOB CARDS (MOCK)
-            _jobCard(),
-            _jobCard(),
-            _jobCard(),
+            _workerCard(
+              name: "Ramesh Kumar",
+              role: "Plumber",
+              rating: "4.5",
+              reviews: "127",
+              experience: "8 years",
+              location: "Sector 12, Delhi",
+            ),
+            _workerCard(
+              name: "Vijay Singh",
+              role: "Painter",
+              rating: "4.8",
+              reviews: "203",
+              experience: "6 years",
+              location: "Lajpat Nagar, Delhi",
+            ),
           ],
         ),
       ),
     );
   }
 
-  // 🔍 SEARCH BAR
+  // 🔍 Search bar
   Widget _searchBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -74,14 +83,14 @@ class FindJobsScreen extends StatelessWidget {
       child: const TextField(
         decoration: InputDecoration(
           icon: Icon(Icons.search),
-          hintText: "Search jobs...",
+          hintText: "Search workers by name or skill...",
           border: InputBorder.none,
         ),
       ),
     );
   }
 
-  // 🧩 CATEGORY CHIPS
+  // 🧩 Category chips
   Widget _categoryChips() {
     final categories = ["All", "Plumber", "Painter", "Driver"];
 
@@ -114,12 +123,15 @@ class FindJobsScreen extends StatelessWidget {
     );
   }
 
-  // 📌 HEADER
-  Widget _jobsHeader() {
+  // 📌 Header
+  Widget _header() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: const [
-        Text("5 jobs available", style: TextStyle(fontWeight: FontWeight.w600)),
+        Text(
+          "6 workers available",
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         Row(
           children: [
             Icon(Icons.filter_list, size: 18),
@@ -131,8 +143,15 @@ class FindJobsScreen extends StatelessWidget {
     );
   }
 
-  // 🧱 JOB CARD
-  Widget _jobCard() {
+  // 🧑 Worker card
+  Widget _workerCard({
+    required String name,
+    required String role,
+    required String rating,
+    required String reviews,
+    required String experience,
+    required String location,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
@@ -145,57 +164,60 @@ class FindJobsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              _tag("Plumber", primaryColor),
-              const SizedBox(width: 6),
-              _tag("URGENT", Colors.orange),
-              const SizedBox(width: 6),
-              _tag("Verified", Colors.green),
+              CircleAvatar(
+                backgroundColor: primaryColor,
+                child: Text(
+                  name[0],
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      children: [
+                        _tag(role, primaryColor),
+                        const SizedBox(width: 6),
+                        _tag("Available Now", Colors.green),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.verified, color: Colors.green),
             ],
           ),
 
-          const SizedBox(height: 10),
-
-          const Text(
-            "Need Plumber for Kitchen Repair",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-
-          const SizedBox(height: 6),
-
-          const Text(
-            "Kitchen sink and pipe repair needed urgently. Must have 2+ years experience.",
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
 
           Row(
-            children: const [
-              Icon(Icons.location_on, size: 16, color: Colors.red),
-              SizedBox(width: 4),
-              Text("Sector 15, Delhi"),
-              Spacer(),
-              Icon(Icons.access_time, size: 16, color: Colors.red),
-              SizedBox(width: 4),
-              Text("2 hours ago"),
+            children: [
+              const Icon(Icons.star, size: 16, color: Colors.orange),
+              const SizedBox(width: 4),
+              Text("$rating ($reviews reviews)"),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          Text("Expert in all $role work. Fast and reliable service."),
 
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-            decoration: BoxDecoration(
-              color: Colors.green.shade100,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Text(
-              "₹800–1000 / day",
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Icon(Icons.work, size: 16),
+              const SizedBox(width: 4),
+              Text(experience),
+              const Spacer(),
+              const Icon(Icons.location_on, size: 16),
+              const SizedBox(width: 4),
+              Text(location),
+            ],
           ),
 
           const SizedBox(height: 12),
@@ -210,7 +232,7 @@ class FindJobsScreen extends StatelessWidget {
                 ),
               ),
               onPressed: () {},
-              child: const Text("View Contact"),
+              child: const Text("Get Contact"),
             ),
           ),
         ],

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../jobs/jobs_list_screen.dart';
 import '../profile/profile_screen.dart';
+import '../jobs/find_job_screen.dart';
+import '../workers/find_workers_screen.dart';
+import '../jobs/jobs_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,9 +15,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
+  final List<Widget> _pages = [
     HomeContent(),
-    Center(child: Text("Jobs Page", style: TextStyle(fontSize: 22))),
+    JobsHomeScreen(),
     ProfileScreen(),
   ];
 
@@ -67,7 +70,18 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
+  final List<Map<String, dynamic>> categories = [
+    {"name": "Plumber", "icon": Icons.plumbing, "color": Colors.blue},
+    {"name": "Painter", "icon": Icons.format_paint, "color": Colors.orange},
+    {"name": "Driver", "icon": Icons.local_shipping, "color": Colors.green},
+    {"name": "Electrician", "icon": Icons.flash_on, "color": Colors.amber},
+    {"name": "Carpenter", "icon": Icons.handyman, "color": Colors.purple},
+    {"name": "Mason", "icon": Icons.construction, "color": Colors.red},
+    {"name": "Cleaner", "icon": Icons.cleaning_services, "color": Colors.pink},
+    {"name": "Other", "icon": Icons.more_horiz, "color": Colors.indigo},
+  ];
+
+  HomeContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -102,23 +116,54 @@ class HomeContent extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 🚀 PRIMARY ACTIONS (MOST IMPORTANT)
+          // 🚀 PRIMARY ACTIONS (MOST IMPORTANT)
           Row(
-            children: const [
+            children: [
+              // ✅ FIND JOBS
               Expanded(
-                child: PrimaryActionCard(
-                  title: "Find Jobs",
-                  subtitle: "Work near you",
-                  icon: Icons.work,
-                  color: Color(0xFF1B0C6D),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => FindJobsScreen()),
+                      );
+                    },
+                    child: const PrimaryActionCard(
+                      title: "Find Jobs",
+                      subtitle: "Work near you",
+                      icon: Icons.work,
+                      color: Color(0xFF1B0C6D),
+                    ),
+                  ),
                 ),
               ),
-              SizedBox(width: 16),
+
+              const SizedBox(width: 16),
+
+              // ✅ HIRE WORKERS
               Expanded(
-                child: PrimaryActionCard(
-                  title: "Hire Workers",
-                  subtitle: "Trusted professionals",
-                  icon: Icons.people,
-                  color: Color(0xFF16A34A),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => FindWorkersScreen()),
+                      );
+                    },
+                    child: const PrimaryActionCard(
+                      title: "Hire Workers",
+                      subtitle: "Trusted professionals",
+                      icon: Icons.people,
+                      color: Color(0xFF16A34A),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -147,29 +192,90 @@ class HomeContent extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          GridView.count(
+          GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            children: const [
-              CategoryTile(icon: Icons.flash_on, label: "Electrician"),
-              CategoryTile(icon: Icons.plumbing, label: "Plumber"),
-              CategoryTile(icon: Icons.construction, label: "Carpenter"),
-              CategoryTile(icon: Icons.local_shipping, label: "Driver"),
-              CategoryTile(icon: Icons.build, label: "Technician"),
-              CategoryTile(icon: Icons.home_repair_service, label: "Mechanic"),
-              CategoryTile(icon: Icons.more_horiz, label: "Others"),
-            ],
+            itemCount: categories.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.3,
+            ),
+            itemBuilder: (context, index) {
+              final category = categories[index];
+
+              return InkWell(
+                borderRadius: BorderRadius.circular(18),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          JobsListScreen(category: category["name"]),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 10,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundColor: category["color"],
+                        child: Icon(
+                          category["icon"],
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        category["name"],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        "Find Now",
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
 
           const SizedBox(height: 32),
 
           // ⭐ Popular Jobs
-          const Text(
-            "Popular Jobs",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                "Popular Jobs",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                "View all",
+                style: TextStyle(fontSize: 13, color: Color(0xFF1B0C6D)),
+              ),
+            ],
           ),
 
           const SizedBox(height: 12),
@@ -221,68 +327,6 @@ class HomeContent extends StatelessWidget {
   }
 }
 
-class CategoryTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const CategoryTile({super.key, required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => JobsListScreen(category: label)),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              backgroundColor: label == "Others"
-                  ? Colors.grey.shade200
-                  : const Color(0xFF1B0C6D).withOpacity(0.1),
-              child: Icon(
-                icon,
-                color: label == "Others"
-                    ? Colors.black54
-                    : const Color(0xFF1B0C6D),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              "Find now",
-              style: TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -291,19 +335,21 @@ class QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1B0C6D).withOpacity(0.08),
-            shape: BoxShape.circle,
+    return Container(
+      width: 72,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: commonCardDecoration(),
+      child: Column(
+        children: [
+          Icon(icon, color: const Color(0xFF1B0C6D), size: 20),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11),
+            textAlign: TextAlign.center,
           ),
-          child: Icon(icon, color: const Color(0xFF1B0C6D)),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 12)),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -324,29 +370,34 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6),
-        ],
-      ),
+      padding: const EdgeInsets.all(12),
+      decoration: commonCardDecoration(),
       child: Row(
         children: [
           CircleAvatar(
+            radius: 20,
             backgroundColor: const Color(0xFF1B0C6D).withOpacity(0.1),
-            child: Icon(icon, color: const Color(0xFF1B0C6D)),
+            child: Icon(icon, color: const Color(0xFF1B0C6D), size: 20),
           ),
-
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              Text(subtitle, style: const TextStyle(color: Colors.grey)),
-            ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -364,20 +415,27 @@ class WorkerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      padding: const EdgeInsets.all(12),
+      decoration: commonCardDecoration(),
       child: Row(
         children: [
-          const CircleAvatar(child: Icon(Icons.person)),
-          const SizedBox(width: 16),
+          const CircleAvatar(radius: 20, child: Icon(Icons.person, size: 20)),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(skill, style: const TextStyle(color: Colors.grey)),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                skill,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
             ],
           ),
         ],
@@ -501,4 +559,18 @@ class AppDrawer extends StatelessWidget {
       ),
     );
   }
+}
+
+BoxDecoration commonCardDecoration() {
+  return BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(14),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.05),
+        blurRadius: 8,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  );
 }
