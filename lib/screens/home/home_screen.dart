@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../jobs/jobs_list_screen.dart';
 import '../profile/profile_screen.dart';
 import '../jobs/find_job_screen.dart';
+import '../workers/find_workers_screen.dart';
+import '../jobs/jobs_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = [
     HomeContent(),
-    Center(child: Text("Jobs Page", style: TextStyle(fontSize: 22))),
+    JobsHomeScreen(),
     ProfileScreen(),
   ];
 
@@ -114,8 +116,10 @@ class HomeContent extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 🚀 PRIMARY ACTIONS (MOST IMPORTANT)
+          // 🚀 PRIMARY ACTIONS (MOST IMPORTANT)
           Row(
             children: [
+              // ✅ FIND JOBS
               Expanded(
                 child: Material(
                   color: Colors.transparent,
@@ -128,7 +132,7 @@ class HomeContent extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => FindJobsScreen()),
                       );
                     },
-                    child: PrimaryActionCard(
+                    child: const PrimaryActionCard(
                       title: "Find Jobs",
                       subtitle: "Work near you",
                       icon: Icons.work,
@@ -138,13 +142,28 @@ class HomeContent extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
+
+              // ✅ HIRE WORKERS
               Expanded(
-                child: PrimaryActionCard(
-                  title: "Hire Workers",
-                  subtitle: "Trusted professionals",
-                  icon: Icons.people,
-                  color: Color(0xFF16A34A),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => FindWorkersScreen()),
+                      );
+                    },
+                    child: const PrimaryActionCard(
+                      title: "Hire Workers",
+                      subtitle: "Trusted professionals",
+                      icon: Icons.people,
+                      color: Color(0xFF16A34A),
+                    ),
+                  ),
                 ),
               ),
             ],
