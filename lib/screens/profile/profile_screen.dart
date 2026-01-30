@@ -1,48 +1,53 @@
 import 'package:flutter/material.dart';
 import '../jobs/post_job_screen.dart';
+import '../../services/user_session.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  // Temporary role flag (later from backend)
-  final bool isProvider = true;
-
   @override
   Widget build(BuildContext context) {
+    final String email = UserSession.email ?? "Unknown";
+    final String role = UserSession.role ?? "user";
+
+    // Example logic: job provider vs seeker
+    final bool isProvider = role == "provider" || role == "user";
+
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-
-      appBar: AppBar(title: const Text("Profile")),
-
+      appBar: AppBar(title: const Text("Profile"), centerTitle: true),
       body: Column(
         children: [
-          // User header
+          // 🔹 USER HEADER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 6,
+                ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Adithyan T T",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  email.split('@').first, // simple name from email
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
+                Text(email, style: const TextStyle(color: Colors.grey)),
+                const SizedBox(height: 6),
                 Text(
-                  "adithyan@email.com",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  "Role: Job Provider",
+                  role == "admin" ? "Role: Admin" : "Role: User",
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: role == "admin" ? Colors.red : Colors.blue,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -52,14 +57,16 @@ class ProfileScreen extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Action list
+          // 🔹 ACTION LIST
           Expanded(
             child: ListView(
               children: [
                 _ProfileTile(
                   icon: Icons.work_outline,
                   title: "My Jobs",
-                  onTap: () {},
+                  onTap: () {
+                    // TODO: navigate to my jobs screen
+                  },
                 ),
 
                 if (isProvider)
@@ -80,7 +87,15 @@ class ProfileScreen extends StatelessWidget {
                   icon: Icons.logout,
                   title: "Logout",
                   onTap: () {
-                    // later: logout logic
+                    // 🔐 CLEAR SESSION
+                    UserSession.clear();
+
+                    // 🔁 GO TO LOGIN (CLEAR STACK)
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
                   },
                 ),
               ],
