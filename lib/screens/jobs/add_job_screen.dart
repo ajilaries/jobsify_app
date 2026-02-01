@@ -127,6 +127,8 @@ class _AddJobScreenState extends State<AddJobScreen> {
 
   // 🔹 SUBMIT (UI only for now)
   void _submit() async {
+    if (!mounted) return; // Safety check before async operation
+
     try {
       await JobService.createJob(
         title: _nameController.text,
@@ -136,12 +138,18 @@ class _AddJobScreenState extends State<AddJobScreen> {
         phone: _phoneController.text,
       );
 
+      // Check mounted again after async operation
+      if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Job posted successfully")));
 
       Navigator.pop(context, true); // important
     } catch (e) {
+      // Check mounted again after async operation
+      if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Failed to post job")));
