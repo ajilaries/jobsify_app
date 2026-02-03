@@ -1,72 +1,85 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  // static const String baseUrl = "http://10.137.141.105:8000";
-  static const String baseUrl = "http://172.22.39.105:8000"; //A06  hotsopt
-
-  // OR use http://localhost:8000 for emulator
-
-  // ✅ REGISTER
-  static Future<bool> registerUser({
+  // static const String baseUrl = "http://172.22.39.105:8000";
+  static const String baseUrl = "http://10.137.141.105:8000";
+  // ================= REGISTER =================
+  static Future<Map<String, dynamic>> registerUser({
     required String name,
     required String email,
     required String password,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse("$baseUrl/auth/register"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"name": name, "email": email, "password": password}),
-      );
+      final response = await http
+          .post(
+            Uri.parse("$baseUrl/auth/register"),
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              "name": name,
+              "email": email,
+              "password": password,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
-      print("REGISTER RESPONSE: ${response.body}");
-      return response.statusCode == 200;
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          "success": true,
+          "message": body["message"] ?? "Registered successfully",
+        };
+      } else {
+        return {
+          "success": false,
+          "message": body["detail"] ?? "Registration failed",
+        };
+      }
     } catch (e) {
-      print("REGISTER ERROR: $e");
-      return false;
+      return {"success": false, "message": "Unable to connect to server"};
     }
   }
 
-  // ✅ LOGIN (RETURN ROLE)
-  static Future<Map<String, dynamic>?> loginUser({
+  // ================= LOGIN =================
+  static Future<Map<String, dynamic>> loginUser({
     required String email,
     required String password,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse("$baseUrl/auth/login"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
-      );
+      final response = await http
+          .post(
+            Uri.parse("$baseUrl/auth/login"),
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({"email": email, "password": password}),
+          )
+          .timeout(const Duration(seconds: 10));
 
-      print("LOGIN RESPONSE: ${response.body}");
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
-      return null;
-    } catch (e) {
-      print("LOGIN ERROR: $e");
-      return null;
-    }
-  }
-
-  // ✅ FETCH LATEST PROFILE (optional; backend may expose this endpoint)
-  static Future<Map<String, dynamic>?> fetchProfile({required String email}) async {
-    try {
-      final uri = Uri.parse("$baseUrl/auth/profile?email=$email");
-      final response = await http.get(uri, headers: {"Content-Type": "application/json"});
-
-      print("PROFILE RESPONSE: ${response.body}");
+      final decoded = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        // ✅ Normalize response for Flutter UI
+        return {
+          "success": true,
+          "data": {
+            "id": decoded["id"],
+            "name": decoded["name"],
+            "email": decoded["email"],
+            "role": decoded["role"],
+          },
+        };
       }
-      return null;
+
+      return {
+        "success": false,
+        "message": decoded["detail"] ?? "Login failed",
+        "status": response.statusCode,
+      };
+    } on TimeoutException {
+      return {"success": false, "message": "Server timeout"};
     } catch (e) {
-      print("PROFILE ERROR: $e");
-      return null;
+      return {"success": false, "message": "Unable to connect to server"};
     }
   }
 }
