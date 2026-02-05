@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../admin/admin_dashboard.dart';
-import '../../services/user_session.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -36,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-
               const Text(
                 "Jobsify",
                 style: TextStyle(
@@ -45,17 +42,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Color(0xFF1B0C6D),
                 ),
               ),
-
               const SizedBox(height: 8),
               const Text(
                 "Find local jobs and manage work easily",
                 style: TextStyle(color: Colors.grey),
               ),
-
               const SizedBox(height: 40),
 
               _inputField(label: "Email", controller: emailController),
-
               const SizedBox(height: 20),
 
               _inputField(
@@ -115,7 +109,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 🔐 LOGIN
   Future<void> _loginUser() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -140,20 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final data = result["data"] as Map<String, dynamic>;
-
-    // ✅ STORE SESSION
-    UserSession.email = data['email'];
-    UserSession.role = data['role'];
-    UserSession.userName = data['name'];
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', data['email']);
-    await prefs.setString('role', data['role']);
-    await prefs.setString('user_name', data['name']);
-
-    // 🚦 REDIRECT
-    if (data['role'].toString().toLowerCase() == "admin") {
+    // 🚦 TEMP ADMIN CHECK (DEV ONLY)
+    if (email.toLowerCase().contains("admin")) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const AdminDashboard()),
