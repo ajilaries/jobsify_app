@@ -1,10 +1,11 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../utils/api_endpoints.dart';
+import '../services/user_session.dart';
+
 class AuthService {
-  // static const String baseUrl = "http://172.22.39.105:8000";
-  static const String baseUrl = "http://10.137.141.105:8000";
   // ================= REGISTER =================
   static Future<Map<String, dynamic>> registerUser({
     required String name,
@@ -14,7 +15,7 @@ class AuthService {
     try {
       final response = await http
           .post(
-            Uri.parse("$baseUrl/auth/register"),
+            Uri.parse("${ApiEndpoints.baseUrl}/auth/register"),
             headers: {"Content-Type": "application/json"},
             body: jsonEncode({
               "name": name,
@@ -31,18 +32,20 @@ class AuthService {
           "success": true,
           "message": body["message"] ?? "Registered successfully",
         };
-      } else {
-        return {
-          "success": false,
-          "message": body["detail"] ?? "Registration failed",
-        };
       }
+
+      return {
+        "success": false,
+        "message": body["detail"] ?? "Registration failed",
+      };
+    } on TimeoutException {
+      return {"success": false, "message": "Server timeout"};
     } catch (e) {
       return {"success": false, "message": "Unable to connect to server"};
     }
   }
 
-  // ================= LOGIN =================
+  // ================= LOGIN (JSON – FINAL FIX) =================
   static Future<Map<String, dynamic>> loginUser({
     required String email,
     required String password,
@@ -50,35 +53,32 @@ class AuthService {
     try {
       final response = await http
           .post(
-            Uri.parse("$baseUrl/auth/login"),
+            Uri.parse(ApiEndpoints.login),
             headers: {"Content-Type": "application/json"},
             body: jsonEncode({"email": email, "password": password}),
           )
           .timeout(const Duration(seconds: 10));
 
+      print("LOGIN STATUS CODE: ${response.statusCode}");
+      print("LOGIN RAW RESPONSE: ${response.body}");
+
       final decoded = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // ✅ Normalize response for Flutter UI
-        return {
-          "success": true,
-          "data": {
-            "id": decoded["id"],
-            "name": decoded["name"],
-            "email": decoded["email"],
-            "role": decoded["role"],
-          },
-        };
+        // ✅ SAVE USER SESSION DATA
+        UserSession.email = decoded["email"];
+        UserSession.userName = decoded["name"];
+        UserSession.role = decoded["role"];
+
+        return {"success": true};
       }
 
       return {
         "success": false,
-        "message": decoded["detail"] ?? "Login failed",
-        "status": response.statusCode,
+        "message": decoded["detail"] ?? "Invalid credentials",
       };
-    } on TimeoutException {
-      return {"success": false, "message": "Server timeout"};
     } catch (e) {
+      print("LOGIN ERROR: $e");
       return {"success": false, "message": "Unable to connect to server"};
     }
   }

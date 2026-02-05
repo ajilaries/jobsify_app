@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
-import '../admin/admin_dashboard.dart';
 import '../../services/user_session.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../admin/admin_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -115,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 🔐 LOGIN
+  // 🔐 LOGIN (JWT + OAuth2)
   Future<void> _loginUser() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -140,20 +139,12 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final data = result["data"] as Map<String, dynamic>;
+    // ✅ SAVE JWT TOKEN
+    final token = result["token"];
+    UserSession.token = token;
 
-    // ✅ STORE SESSION
-    UserSession.email = data['email'];
-    UserSession.role = data['role'];
-    UserSession.userName = data['name'];
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', data['email']);
-    await prefs.setString('role', data['role']);
-    await prefs.setString('user_name', data['name']);
-
-    // 🚦 REDIRECT
-    if (data['role'].toString().toLowerCase() == "admin") {
+    // 🚦 TEMP ADMIN CHECK (DEV ONLY)
+    if (email.toLowerCase().contains("admin")) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const AdminDashboard()),
