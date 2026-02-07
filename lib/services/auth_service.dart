@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/api_endpoints.dart';
+import '../utils/api_constants.dart';
 import '../services/user_session.dart';
 
 class AuthService {
@@ -70,6 +71,11 @@ class AuthService {
         UserSession.email = decoded["email"];
         UserSession.userName = decoded["name"];
         UserSession.role = decoded["role"];
+
+        // Override role for predefined admin emails
+        if (ApiConstants.adminEmails.contains(decoded["email"])) {
+          UserSession.role = 'admin';
+        }
 
         return {"success": true};
       }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../auth/login_screen.dart';
 import '../home/home_screen.dart';
+import '../admin/admin_dashboard.dart';
 import '../../services/user_session.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,10 +22,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
       // Check if user is already logged in
       if (UserSession.isLoggedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        if (UserSession.role == 'admin') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboard()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        }
       } else {
         Navigator.pushReplacement(
           context,

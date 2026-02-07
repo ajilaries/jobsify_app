@@ -4,7 +4,6 @@ import '../profile/profile_screen.dart';
 import '../jobs/find_job_screen.dart';
 import '../workers/find_workers_screen.dart';
 import '../jobs/jobs_home_screen.dart';
-import '../jobs/post_job_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../services/user_session.dart';
 
@@ -200,7 +199,7 @@ class _HomeContentState extends State<HomeContent> {
               delegate: SliverChildBuilderDelegate((context, index) {
                 final ctaCards = [
                   {
-                    "color": kBlue,
+                    "color": const Color(0xFFFF1E2D),
                     "title": "Browse Jobs",
                     "subtitle": "Find available work",
                     "icon": Icons.work_outline,
@@ -225,67 +224,6 @@ class _HomeContentState extends State<HomeContent> {
                       );
                     },
                   },
-                  {
-                    "color": Colors.orange,
-                    "title": "Post a Job",
-                    "subtitle": "Create job listings",
-                    "icon": Icons.add_circle_outline,
-                    "onTap": () {
-                      _searchFocusNode.unfocus();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const PostJobScreen(),
-                        ),
-                      );
-                    },
-                  },
-                  {
-                    "color": Colors.purple,
-                    "title": "Plumber",
-                    "subtitle": "Find plumbing services",
-                    "icon": Icons.plumbing,
-                    "onTap": () {
-                      _searchFocusNode.unfocus();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => JobsListScreen(category: "Plumber"),
-                        ),
-                      );
-                    },
-                  },
-                  {
-                    "color": Colors.red,
-                    "title": "Electrician",
-                    "subtitle": "Electrical work",
-                    "icon": Icons.flash_on,
-                    "onTap": () {
-                      _searchFocusNode.unfocus();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              JobsListScreen(category: "Electrician"),
-                        ),
-                      );
-                    },
-                  },
-                  {
-                    "color": Colors.brown,
-                    "title": "Carpenter",
-                    "subtitle": "Woodwork & repairs",
-                    "icon": Icons.handyman,
-                    "onTap": () {
-                      _searchFocusNode.unfocus();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => JobsListScreen(category: "Carpenter"),
-                        ),
-                      );
-                    },
-                  },
                 ];
                 final card = ctaCards[index];
                 return _ctaCard(
@@ -295,12 +233,12 @@ class _HomeContentState extends State<HomeContent> {
                   icon: card["icon"] as IconData,
                   onTap: card["onTap"] as VoidCallback,
                 );
-              }, childCount: 6),
+              }, childCount: 2),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+                crossAxisCount: 1,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.8,
+                childAspectRatio: 2.5,
               ),
             ),
           ),
@@ -443,7 +381,7 @@ class _HomeContentState extends State<HomeContent> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -465,7 +403,7 @@ class _HomeContentState extends State<HomeContent> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: TextStyle(

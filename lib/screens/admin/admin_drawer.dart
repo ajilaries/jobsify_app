@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../services/user_session.dart';
+import '../../widgets/confirm_dialog.dart';
 import 'admin_constants.dart';
 import 'admin_dashboard.dart';
 import 'screens/job_verification_screen.dart';
@@ -64,11 +66,25 @@ class AdminDrawer extends StatelessWidget {
             ),
             const Spacer(),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {
-                // later: implement logout
-                Navigator.of(context).pop();
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                final confirmed = await showConfirmDialog(
+                  context: context,
+                  title: 'Confirm Logout',
+                  message: 'Are you sure you want to logout?',
+                  confirmText: 'Logout',
+                  cancelText: 'Cancel',
+                );
+                if (confirmed == true) {
+                  Navigator.of(context).pop();
+                  UserSession.clear();
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/login',
+                    (route) => false,
+                  );
+                }
               },
             ),
           ],

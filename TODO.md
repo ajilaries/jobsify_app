@@ -1,7 +1,4 @@
-# TODO: Home Screen Categories Grid Update
+# TODO: Fix Logout in Admin Drawer
 
-## Tasks
-- [ ] Add 4 new categories to the categories list: Gardener, Cook, Security Guard, Mechanic
-- [ ] Change grid layout from 2 cards per row to 3 cards per row
-- [ ] Reduce avatar size from 26 to 20 for smaller cards
-- [ ] Test the layout changes
+- [ ] Add imports for user_session.dart and confirm_dialog.dart in admin_drawer.dart
+- [ ] Update the logout ListTile's onTap to show confirmation dialog and perform logout
