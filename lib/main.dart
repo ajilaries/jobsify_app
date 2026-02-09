@@ -4,13 +4,19 @@ import 'services/theme_service.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/auth/otp_verification_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/admin/admin_dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await UserSession.loadSession();
-  await ThemeService.loadTheme();
+  try {
+    await UserSession.loadSession();
+    await ThemeService.loadTheme();
+  } catch (e) {
+    // In case of error loading session/theme, continue with defaults
+    debugPrint('Error loading session/theme: $e');
+  }
   runApp(const MyApp());
 }
 
@@ -32,6 +38,16 @@ class MyApp extends StatelessWidget {
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),
+            '/otp-verification': (context) {
+              final args =
+                  ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>?;
+              return OtpVerificationScreen(
+                userId: args?['userId'],
+                userName: args?['userName'],
+                email: args?['email'],
+              );
+            },
             '/home': (context) => const HomeScreen(),
             '/admin': (context) => const AdminDashboard(),
           },
