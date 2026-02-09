@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/job_model.dart';
 import '../../services/theme_service.dart';
+import '../../services/job_service.dart';
+import '../../services/user_session.dart';
 
 /// UI COLORS
 const Color kRed = Color(0xFFFF1E2D);
@@ -19,6 +21,7 @@ class JobDetailScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Cannot open dialer")));
@@ -42,10 +45,107 @@ class JobDetailScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Cannot open Google Maps")));
     }
+  }
+
+  /// 🔴 REPORT MODAL (NEW)
+  void _openReportModal(BuildContext context) {
+    String selectedReason = "Fraud / Scam";
+    final descCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Report Job",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+
+                  ...[
+                    "Fraud / Scam",
+                    "Asking advance payment",
+                    "Fake profile",
+                    "Bad behavior",
+                    "Other",
+                  ].map(
+                    (reason) => RadioListTile<String>(
+                      title: Text(reason),
+                      value: reason,
+                      groupValue: selectedReason,
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedReason = value;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+
+                  TextField(
+                    controller: descCtrl,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: "Additional details (optional)",
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await JobService.reportJob(
+                        jobId: job.id,
+                        reason: selectedReason,
+                        description: descCtrl.text.trim(),
+                        reporterEmail: UserSession.email ?? '',
+                      );
+
+                      if (!context.mounted) return;
+                      Navigator.pop(context);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Report submitted")),
+                      );
+                    },
+                    child: const Text("Submit Report"),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -60,6 +160,18 @@ class JobDetailScreen extends StatelessWidget {
           backgroundColor: kGreen,
           foregroundColor: Colors.white,
           title: const Text("Job Details"),
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == "report") {
+                  _openReportModal(context);
+                }
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: "report", child: Text("Report Job")),
+              ],
+            ),
+          ],
         ),
 
         body: Column(

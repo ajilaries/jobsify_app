@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../services/worker_service.dart';
+import '../../services/job_service.dart';
+import '../../services/user_session.dart';
+import '../../models/job_model.dart';
 
 class AddJobScreen extends StatefulWidget {
-  const AddJobScreen({super.key});
+  final Job? jobToEdit; // Optional job for editing
+
+  const AddJobScreen({super.key, this.jobToEdit});
 
   @override
   State<AddJobScreen> createState() => _AddJobScreenState();
@@ -13,13 +17,25 @@ class _AddJobScreenState extends State<AddJobScreen> {
 
   static const Color primaryColor = Color(0xFF1B0C6D);
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _experienceController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _aboutController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
   String _selectedCategory = "Plumber";
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.jobToEdit != null) {
+      // Pre-fill fields for editing
+      _titleController.text = widget.jobToEdit!.title;
+      _selectedCategory = widget.jobToEdit!.category;
+      _descriptionController.text = widget.jobToEdit!.description;
+      _locationController.text = widget.jobToEdit!.location;
+      _phoneController.text = widget.jobToEdit!.phone;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +44,7 @@ class _AddJobScreenState extends State<AddJobScreen> {
 
       appBar: AppBar(
         backgroundColor: primaryColor,
-        title: const Text("Create Worker Profile"),
+        title: Text(widget.jobToEdit != null ? "Edit Job" : "Post a Job"),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
@@ -40,25 +56,26 @@ class _AddJobScreenState extends State<AddJobScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _label("Full Name"),
+            _label("Job Title"),
             _textField(
               context,
-              "Enter your full name",
-              controller: _nameController,
+              "Enter job title",
+              controller: _titleController,
             ),
 
             const SizedBox(height: 16),
 
-            _label("Skill Category"),
+            _label("Category"),
             _dropdown(context),
 
             const SizedBox(height: 16),
 
-            _label("Experience"),
+            _label("Description"),
             _textField(
               context,
-              "e.g., 5 years",
-              controller: _experienceController,
+              "Describe the job",
+              controller: _descriptionController,
+              maxLines: 4,
             ),
 
             const SizedBox(height: 16),
@@ -66,7 +83,7 @@ class _AddJobScreenState extends State<AddJobScreen> {
             _label("Location"),
             _textField(
               context,
-              "Enter your area",
+              "Enter location",
               controller: _locationController,
             ),
 
@@ -78,16 +95,6 @@ class _AddJobScreenState extends State<AddJobScreen> {
               "10-digit mobile number",
               controller: _phoneController,
               keyboard: TextInputType.phone,
-            ),
-
-            const SizedBox(height: 16),
-
-            _label("About You"),
-            _textField(
-              context,
-              "Describe your skills and experience",
-              controller: _aboutController,
-              maxLines: 4,
             ),
 
             const SizedBox(height: 24),
@@ -107,7 +114,9 @@ class _AddJobScreenState extends State<AddJobScreen> {
                       backgroundColor: primaryColor,
                     ),
                     onPressed: _isLoading ? null : _submit,
-                    child: const Text("Save Profile"),
+                    child: Text(
+                      widget.jobToEdit != null ? "Update Job" : "Post Job",
+                    ),
                   ),
                 ),
               ],
@@ -121,37 +130,46 @@ class _AddJobScreenState extends State<AddJobScreen> {
   /// 🔹 SUBMIT (BACKEND SAFE)
   void _submit() async {
     // Basic validation
-    if (_nameController.text.isEmpty ||
-        _experienceController.text.isEmpty ||
+    if (_titleController.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
         _locationController.text.isEmpty ||
         _phoneController.text.isEmpty) {
       _showSnack("All fields are required.");
       return;
     }
 
-    final experience = int.tryParse(_experienceController.text.trim());
-    if (experience == null || experience < 0) {
-      _showSnack("Please enter a valid number for experience.");
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {
-      // This screen creates a WORKER, so we use WorkerService.
-      await WorkerService.createWorker(
-        name: _nameController.text.trim(),
-        role: _selectedCategory,
-        phone: _phoneController.text.trim(),
-        experience: experience,
-        location: _locationController.text,
-        // latitude and longitude are not collected on this screen.
-      );
+      if (widget.jobToEdit != null) {
+        // Update existing job
+        await JobService.updateJob(
+          jobId: widget.jobToEdit!.id,
+          title: _titleController.text.trim(),
+          category: _selectedCategory,
+          description: _descriptionController.text.trim(),
+          location: _locationController.text.trim(),
+          phone: _phoneController.text.trim(),
+          userEmail: UserSession.email ?? '',
+        );
+      } else {
+        // Create new job
+        await JobService.createJob(
+          title: _titleController.text.trim(),
+          category: _selectedCategory,
+          description: _descriptionController.text.trim(),
+          location: _locationController.text.trim(),
+          phone: _phoneController.text.trim(),
+          userEmail: UserSession.email ?? '',
+        );
+      }
 
       if (!mounted) return;
 
       _showSnack(
-        "Profile saved successfully. It will be reviewed by an admin.",
+        widget.jobToEdit != null
+            ? "Job updated successfully."
+            : "Job will be posted after admin approval",
       );
       Navigator.pop(context, true);
     } catch (e) {

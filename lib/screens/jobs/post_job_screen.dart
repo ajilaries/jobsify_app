@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/job_service.dart';
 import '../../services/location_service.dart';
+import '../../services/user_session.dart';
 
 /// UI COLORS
 const Color kRed = Color(0xFFFF1E2D);
@@ -90,11 +91,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
         phone: phoneCtrl.text.trim(),
         latitude: latitude,
         longitude: longitude,
+        userEmail: UserSession.email ?? '', // Add user email
       );
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Job posted successfully")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Job will be posted after admin approval"),
+        ),
+      );
 
       Navigator.pop(context, true);
     } catch (e) {
@@ -128,10 +132,11 @@ class _PostJobScreenState extends State<PostJobScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _label("Job Title"),
-              _input(
-                context,
+              TextFormField(
                 controller: titleCtrl,
-                hint: "e.g. Need plumber for pipe repair",
+                decoration: InputDecoration(
+                  hintText: "e.g. Need plumber for pipe repair",
+                ),
                 validator: (v) => v!.isEmpty ? "Enter job title" : null,
               ),
 
