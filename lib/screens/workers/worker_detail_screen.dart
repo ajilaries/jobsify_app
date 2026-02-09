@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/worker_model.dart';
 import '../../services/worker_service.dart';
+import '../../services/user_session.dart';
 
 /// 🎨 COLORS
 const Color kRed = Color(0xFFFF1E2D);
@@ -59,75 +60,82 @@ class WorkerDetailScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 16,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Report Worker",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
               ),
-              const SizedBox(height: 12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Report Worker",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
 
-              ...[
-                "Fraud / Scam",
-                "Asking advance payment",
-                "Fake profile",
-                "Bad behavior",
-                "Other",
-              ].map(
-                (reason) => RadioListTile<String>(
-                  title: Text(reason),
-                  value: reason,
-                  selected: selectedReason == reason,
-                  onChanged: (value) {
-                    if (value != null) {
-                      selectedReason = value;
-                    }
-                  },
-                ),
+                  ...[
+                    "Fraud / Scam",
+                    "Asking advance payment",
+                    "Fake profile",
+                    "Bad behavior",
+                    "Other",
+                  ].map(
+                    (reason) => RadioListTile<String>(
+                      title: Text(reason),
+                      value: reason,
+                      groupValue: selectedReason,
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedReason = value;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+
+                  TextField(
+                    controller: descCtrl,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: "Additional details (optional)",
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      minimumSize: const Size(double.infinity, 48),
+                    ),
+                    onPressed: () async {
+                      await WorkerService.reportWorker(
+                        workerId: worker.id,
+                        reason: selectedReason,
+                        description: descCtrl.text.trim(),
+                        reporterEmail: UserSession.email ?? '',
+                      );
+
+                      Navigator.pop(context);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Report submitted")),
+                      );
+                    },
+                    child: const Text("Submit Report"),
+                  ),
+                ],
               ),
-
-              TextField(
-                controller: descCtrl,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: "Additional details (optional)",
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  minimumSize: const Size(double.infinity, 48),
-                ),
-                onPressed: () async {
-                  await WorkerService.reportWorker(
-                    workerId: worker.id,
-                    reason: selectedReason,
-                    description: descCtrl.text.trim(),
-                  );
-
-                  Navigator.pop(context);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Report submitted")),
-                  );
-                },
-                child: const Text("Submit Report"),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
