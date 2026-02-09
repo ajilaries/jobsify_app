@@ -129,7 +129,18 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => isLoading = false);
 
     if (result["success"] != true) {
-      _showSnack(result["message"] ?? "Login failed");
+      if (result["unverified"] == true) {
+        // Navigate to OTP verification
+        final userId = result["user_id"];
+        final userName = result["name"] ?? "User"; // Backend should return name
+        Navigator.pushNamed(
+          context,
+          '/otp-verification',
+          arguments: {'userId': userId, 'userName': userName, 'email': email},
+        );
+      } else {
+        _showSnack(result["message"] ?? "Login failed");
+      }
       return;
     }
 
