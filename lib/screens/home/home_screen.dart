@@ -5,6 +5,7 @@ import '../jobs/find_job_screen.dart';
 import '../workers/find_workers_screen.dart';
 import '../jobs/jobs_home_screen.dart';
 import '../settings/settings_screen.dart';
+import '../notifications_screen.dart';
 import '../../services/user_session.dart';
 
 /// 🎨 PROFESSIONAL COLORS (UI ONLY)
@@ -425,8 +426,18 @@ class _HomeContentState extends State<HomeContent> {
 /// =======================
 /// 📂 DRAWER (UNCHANGED LOGIC)
 /// =======================
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
+
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -441,11 +452,11 @@ class AppDrawer extends StatelessWidget {
             ),
             accountName: ValueListenableBuilder<String?>(
               valueListenable: UserSession.userNameNotifier,
-              builder: (_, name, __) => Text(name ?? "User"),
+              builder: (_, name, _) => Text(name ?? "User"),
             ),
             accountEmail: ValueListenableBuilder<String?>(
               valueListenable: UserSession.emailNotifier,
-              builder: (_, email, __) => Text(email ?? ""),
+              builder: (_, email, _) => Text(email ?? ""),
             ),
           ),
 
@@ -464,7 +475,18 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           _drawerItem(context, Icons.bookmark_border, "Saved Items"),
-          _drawerItem(context, Icons.notifications_none, "Notifications"),
+          _drawerItem(
+            context,
+            Icons.notifications_none,
+            "Notifications",
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+            },
+          ),
           _drawerItem(
             context,
             Icons.settings_outlined,
