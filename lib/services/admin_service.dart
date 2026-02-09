@@ -77,13 +77,12 @@ class AdminService {
   // 🔹 APPROVE JOB
   // ============================
   static Future<void> approveJob(int jobId) async {
-    final res = await http.post(
-      Uri.parse(ApiEndpoints.approveJob),
+    final res = await http.put(
+      Uri.parse("${ApiEndpoints.approveJob}/$jobId"),
       headers: {
         "Authorization": "Bearer ${UserSession.token}",
         "Content-Type": "application/json",
       },
-      body: jsonEncode({"job_id": jobId}),
     );
 
     debugPrint("APPROVE JOB STATUS: ${res.statusCode}");
@@ -97,13 +96,12 @@ class AdminService {
   // 🔹 REJECT JOB
   // ============================
   static Future<void> rejectJob(int jobId) async {
-    final res = await http.post(
-      Uri.parse(ApiEndpoints.rejectJob),
+    final res = await http.put(
+      Uri.parse("${ApiEndpoints.rejectJob}/$jobId"),
       headers: {
         "Authorization": "Bearer ${UserSession.token}",
         "Content-Type": "application/json",
       },
-      body: jsonEncode({"job_id": jobId}),
     );
 
     debugPrint("REJECT JOB STATUS: ${res.statusCode}");

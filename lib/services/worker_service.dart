@@ -10,7 +10,7 @@ class WorkerService {
   // 🔹 FETCH VERIFIED WORKERS (PUBLIC)
   // ===============================
   static Future<List<Worker>> fetchWorkers() async {
-    final uri = Uri.parse("${ApiEndpoints.baseUrl}/workers");
+    final uri = Uri.parse(ApiEndpoints.workers);
 
     try {
       final res = await http.get(
@@ -45,9 +45,10 @@ class WorkerService {
     required String location,
     String? latitude,
     String? longitude,
+    required String userEmail, // Add user email
   }) async {
     final res = await http.post(
-      Uri.parse("${ApiEndpoints.baseUrl}/workers/"),
+      Uri.parse(ApiEndpoints.workers),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "name": name,
@@ -57,6 +58,7 @@ class WorkerService {
         "location": location,
         "latitude": latitude,
         "longitude": longitude,
+        "user_email": userEmail, // Add user email
       }),
     );
 
@@ -75,6 +77,7 @@ class WorkerService {
     required int workerId,
     required String reason,
     required String description,
+    required String reporterEmail,
   }) async {
     final res = await http.post(
       Uri.parse("${ApiEndpoints.baseUrl}/workers/report"),
@@ -83,6 +86,7 @@ class WorkerService {
         "worker_id": workerId,
         "reason": reason,
         "description": description,
+        "reporter_email": reporterEmail,
       }),
     );
 
@@ -91,6 +95,107 @@ class WorkerService {
 
     if (res.statusCode != 200 && res.statusCode != 201) {
       throw Exception("Report worker failed (${res.statusCode})");
+    }
+  }
+
+  // ===============================
+  // 🔹 FETCH MY WORKERS (USER-SPECIFIC)
+  // ===============================
+
+  static Future<List<Worker>> fetchMyWorkers(String email) async {
+    final uri = Uri.parse('${ApiEndpoints.myWorkers}?email=$email');
+
+    try {
+      final res = await http.get(
+        uri,
+        headers: {"Content-Type": "application/json"},
+      );
+
+      debugPrint("FETCH MY WORKERS STATUS: ${res.statusCode}");
+      debugPrint("FETCH MY WORKERS BODY: ${res.body}");
+
+      if (res.statusCode == 200) {
+        final List data = jsonDecode(res.body);
+        return data.map((e) => Worker.fromJson(e)).toList();
+      } else {
+        throw Exception("Failed to load my workers (${res.statusCode})");
+      }
+    } catch (e) {
+      debugPrint("FETCH MY WORKERS ERROR: $e");
+      throw Exception("Fetch my workers failed");
+    }
+  }
+
+  // ===============================
+  // 🔹 UPDATE WORKER
+  // ===============================
+  static Future<void> updateWorker({
+    required int workerId,
+    required String name,
+    required String role,
+    required String phone,
+    required int experience,
+    required String location,
+    String? latitude,
+    String? longitude,
+    required String userEmail,
+  }) async {
+    final uri = Uri.parse('${ApiEndpoints.workers}/$workerId?email=$userEmail');
+
+    final body = {
+      "name": name,
+      "role": role,
+      "phone": phone,
+      "experience": experience,
+      "location": location,
+      "latitude": latitude,
+      "longitude": longitude,
+      "user_email": userEmail,
+    };
+
+    try {
+      final res = await http.put(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
+      );
+
+      debugPrint("UPDATE WORKER STATUS: ${res.statusCode}");
+      debugPrint("UPDATE WORKER BODY: ${res.body}");
+
+      if (res.statusCode != 200) {
+        throw Exception("Update worker failed (${res.statusCode})");
+      }
+    } catch (e) {
+      debugPrint("UPDATE WORKER ERROR: $e");
+      throw Exception("Update worker failed");
+    }
+  }
+
+  // ===============================
+  // 🔹 DELETE WORKER
+  // ===============================
+  static Future<void> deleteWorker({
+    required int workerId,
+    required String userEmail,
+  }) async {
+    final uri = Uri.parse('${ApiEndpoints.workers}/$workerId?email=$userEmail');
+
+    try {
+      final res = await http.delete(
+        uri,
+        headers: {"Content-Type": "application/json"},
+      );
+
+      debugPrint("DELETE WORKER STATUS: ${res.statusCode}");
+      debugPrint("DELETE WORKER BODY: ${res.body}");
+
+      if (res.statusCode != 200) {
+        throw Exception("Delete worker failed (${res.statusCode})");
+      }
+    } catch (e) {
+      debugPrint("DELETE WORKER ERROR: $e");
+      throw Exception("Delete worker failed");
     }
   }
 }
